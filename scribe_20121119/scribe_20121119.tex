@@ -71,6 +71,60 @@ Michael Powell
 
 This is where the text for the scribe notes go.
 
+review: Gaussian Mixtures Revisited
+We began by recalling that for gaussian mixtures, the EM algorithm involves an E-step of evaluating the probabilities 
+\begin{align*}
+\math{p(z_{k}|x_{n}) = \frac{\pi_{k}\mathcal{N}(x|\mu_{k},\Sigma_{k})}{\sum_{j=1}^{K}{\pi_{j}\mathcal{N}(x|\mu_{j},\Sigma_j)}}} 
+\end{align*}
+and the M-step computes the new parameters 
+
+\begin{align*}
+\mu_k &= \frac{1}{N_{k}}\sum_{n=1}^{N}{p(z_{k}|x_{n})x_{n}} \\
+\Sigma_{k} &= \frac{1}{N_{k}}\sum_{n=1}^{N}{p(z_{k}|x_{n})(x_{n}-\mu_{k})(x_{n}-\mu_{k})^{T}} \\
+\pi_{k} &= \frac{N_{k}}{N}
+\end{align*}
+
+We then turned our attention to the performance of the EM Algorithm in general.  
+EM is applicable when there is missing information.  For example, in clustering (Gaussian mixture model?) missing information is what cluster does each data point belong to?  The cluster for each data point can be called ${Z}$.  We are also missing the parameters ${\mu_k}, {\Sigma_k}$.  In general, for a probabilistic model one can write the log likelihood as
+
+\begin{align*}
+\log p(X|\theta) &= \mathcal{L}(q,\theta) + KL(q||p)
+\end{align*}
+
+where
+
+\begin{align*}
+\mathcal{L}(q,\theta) &= \sum_{z}{q(Z)\log(\frac{p(X,Z|\theta)}{q(Z)})} \\
+KL(q||p) &= \sum_{z}{q(Z)\log(\frac{q(Z)}{p(Z|X,\theta)})}
+\end{align*}
+
+Since $ KL(q||p) \geq 0$, this means that we have a lower bound on the log-likelihood of
+
+\begin{align*}
+\log p(X|\theta) &\geq \mathcal{L}(q,\theta) = E_{q}[\log p(X|\theta)] + H(q)
+\end{align*}
+
+In this sense, 
+
+In the E-step, maximize $\mathcal{L}(q,\theta)$ with respect to $q$.  Since $\log(p(X|\theta))$ does not depend on $q$ we can focus on minimizing the KL divergence $KL(q||p)$. If we use $q(Z) = p(Z|X,\theta)$ as our solution, we have $KL(q||p) = 0$ so for our current parameter estimate $\log p(X|\theta) = \mathcal{L}(q,\theta)$. In the M-step, we maximize $\mathcal{L}(q,\theta)$ with respect to $\theta$. This gives us a new estimated parameter $\theta^{new}$ where for our current $q$, $\mathcal{L}(q,\theta^{new}) \geq \mathcal{L}(q,\theta)$.  However, since the current q is not the optimal distribution for $\theta^{new}$, $KL(q||p) \geq 0$. This means that 
+
+\begin{align*}
+\log p(X|\theta^{new}) &\geq \mathcal{L}(q,\theta^{new}) \geq \mathcal{L}(q,\theta) = \log p(X|\theta)
+\end{align*}
+
+So the log-likelihood will either increase or stay the same after each combination of E-step and M-step.
+
+Variational EM
+
+Over the past 10 years a very popular variant of the EM algorithm has been Variational EM, especially for statistical models.  For some models $p(Z|X,\theta)$ cannot be obtained in closed form.  In this case pick a parameterized family $q_{\gamma}=q(Z|\gamma)$ and minimize with respect to $\gamma$ to minimize $KL(q_{\gamma}||p)$.  This is the same as maximizing a lower bound to the true likelihood
+
+\begin{align*}
+\log p(X|\theta) \geq E_{q_{\gamma}}[\log p(X,Z|\theta)] + H(q_{\gamma})
+\end{align*}
+
+In this process, $KL(q_{gamma}||p)$ does not become zero, but it does decrease.
+
+
 %% Add your references to myrefs.bib and uncomment the following 2 lines
 %\bibliography{myrefs}
 %\bibliographystyle{plain}
