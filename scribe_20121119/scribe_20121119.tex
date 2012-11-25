@@ -65,16 +65,12 @@ Michael Powell
 \end{center}
 \HRule\\
 
-
-
-
-
-This is where the text for the scribe notes go.
+\section{Expectation Maximization}
 
 review: Gaussian Mixtures Revisited
 We began by recalling that for gaussian mixtures, the EM algorithm involves an E-step of evaluating the probabilities 
 \begin{align*}
-\math{p(z_{k}|x_{n}) = \frac{\pi_{k}\mathcal{N}(x|\mu_{k},\Sigma_{k})}{\sum_{j=1}^{K}{\pi_{j}\mathcal{N}(x|\mu_{j},\Sigma_j)}}} 
+p(z_{k}|x_{n}) = \frac{\pi_{k}\mathcal{N}(x|\mu_{k},\Sigma_{k})}{\sum_{j=1}^{K}\pi_{j}\mathcal{N}(x|\mu_{j},\Sigma_j)}
 \end{align*}
 and the M-step computes the new parameters 
 
@@ -124,6 +120,21 @@ Over the past 10 years a very popular variant of the EM algorithm has been Varia
 
 In this process, $KL(q_{gamma}||p)$ does not become zero, but it does decrease.
 
+\section{Spectral Clustering}
+Spectral clustering is a method of assigning data objects to different clusters or classes.  It differes from K-means clustering in that it does not necessarily rely on any Euclidean distance metric and does not make any implicit assumptions about the shape of the clusters within the overall dataset.
+
+The first step in spectral clustering is to create an undirected, weighted graph G among the n data objects under study.  The graph consists of vertices $V=\{v_i:1,2,\dots,n\}$ and edges $E=\{e_{ij}:v_i, v_j \text{ are adjacent}\}$.  The vertices represent the n data objects, which can be anything and do not need to be vectors.  The edges connect vertices that are 'similar' according to any measure of similarity the researcher chooses.  Here is an example of a simple graph representing 7 data objects of some sort:
+
+\begin{figure}
+\includegraphics{graph_0}
+\caption{}
+\end{figure}
+
+Each edge $e_{ij}$ will have a weight $w_{ij}$ representing the degree of similarity between the two vertices (the absence of an edge represents a weight of 0).  These weights can be arranged as a matrix $[w_{ij}]$.
+
+Here is the weight matrix corresponding to the example graph above (assuming for simplicity that all edges in the graph have a weight of 1):
+
+Then, the degree $d_i$ of each vertex is calculated.  For a given node, the degree of that node is a measure of its connectivity wth other nodes.  In a weighted graph, the degree is the sum of the weights between a node and all the other nodes it is connected to.  The degrees $d_i$ of all the vertices can be arranged in a diagonal matrix.
 
 %% Add your references to myrefs.bib and uncomment the following 2 lines
 %\bibliography{myrefs}
