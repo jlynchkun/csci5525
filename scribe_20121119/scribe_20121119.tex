@@ -25,6 +25,9 @@
 
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 
+% next two lines are for \mathbbold{1}
+\DeclareSymbolFont{bbold}{U}{bbold}{m}{n}
+\DeclareSymbolFontAlphabet{\mathbbold}{bbold}
 
 \begin{document}
 
@@ -136,6 +139,46 @@ Here is the weight matrix corresponding to the example graph above (assuming for
 
 Then, the degree $d_i$ of each vertex is calculated.  For a given node, the degree of that node is a measure of its connectivity wth other nodes.  In a weighted graph, the degree is the sum of the weights between a node and all the other nodes it is connected to.  The degrees $d_i$ of all the vertices can be arranged in a diagonal matrix.
 
+
+(slide: graph cuts and spectral clustering)
+consider a data set like (***    ****) and another like a smiley face.  The second data set is not handled well by k-means because a certain geometric structure is assumed.
+
+(slides: example data set slides)
+
+(slide: similarity graphs)
+G=(V,E) a weighted, undirected graph; assume we have already constructed the graph
+each vertex is a data point; a data point need not be a real-valued vector ($x \in \mathbb{R}^d)$
+edge weight tells how similar are 2 data points
+
+(slide: graph notation)
+deg(i)=$\sum w_{ij}$
+'cut' $\bar{A}=V \ A$
+\begin{align*}
+\mathbbold{1}_A &= \begin{bmatrix}
+ 1 \\
+ 1 \\
+ 0 \\
+ 0
+\end{bmatrix}
+\end{align*}
+
+(slide: unnormalized graph Laplacian)
+this is the 'first' kind of graph Laplacian
+\begin{align}
+L_U = D - W
+\end{align}
+where D is a diagonal matrix of vertex degrees and W is the weight matrix (adjacency matrix).  Note diagonal of W is zero since no self-connections.  Also note the sum of each row of $L_u$ is zero.
+
+What's special about $L_u$?
+For any $f \in \mathbb{R}^n$, 
+
+\begin{align}
+f^TL_uf=\sum_{i,j}w_{ij}(f_i-f_j)^2
+\end{align}
+is convex if $L_u$ is positive semidefinite.  In fact, $L_u$ is always symmetric and positive semidefinite.  What does the RHS tell us?  (figure *v*---*x*) To minimize $f^TL_uf$ we need $f_i=f_j$ for edges with large weight.  Edges with low weight can have different $f_i,f_j$.  This is at the crux of what spectral clustering algorithms try to do.  The smallest eigenvalue of $L_u$ is 0, this is the 'trivial solution' for clustering.  The corresponding eigenvector is $\mathbbold{1}$.  Since $L_u\mathbbold{1}=0$ since $L_u\mathbbold{1}$ is a column of row sums.  This may not be so exciting.  Here's the exciting part:
+
+(slide: A Key Property)
+Number of 0 eigenvalues is number of connected components.  (figure: smiley face)
 %% Add your references to myrefs.bib and uncomment the following 2 lines
 %\bibliography{myrefs}
 %\bibliographystyle{plain}
