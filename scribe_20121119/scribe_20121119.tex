@@ -70,24 +70,27 @@ Michael Powell
 
 \section{Expectation Maximization}
 
-review: Gaussian Mixtures Revisited
-We began by recalling that for gaussian mixtures, the EM algorithm involves an E-step of evaluating the probabilities 
+%review: Gaussian Mixtures Revisited
+We began by recalling that for Gaussian mixtures, the EM algorithm involves an E-step of evaluating the probabilities 
 \begin{align*}
 p(z_{k}|x_{n}) = \frac{\pi_{k}\mathcal{N}(x|\mu_{k},\Sigma_{k})}{\sum_{j=1}^{K}\pi_{j}\mathcal{N}(x|\mu_{j},\Sigma_j)}
 \end{align*}
 and the M-step computes the new parameters 
-
 \begin{align*}
 \mu_k &= \frac{1}{N_{k}}\sum_{n=1}^{N}{p(z_{k}|x_{n})x_{n}} \\
 \Sigma_{k} &= \frac{1}{N_{k}}\sum_{n=1}^{N}{p(z_{k}|x_{n})(x_{n}-\mu_{k})(x_{n}-\mu_{k})^{T}} \\
 \pi_{k} &= \frac{N_{k}}{N}
 \end{align*}
 
-We then turned our attention to the performance of the EM Algorithm in general.  
-EM is applicable when there is missing information.  For example, in clustering (Gaussian mixture model?) missing information is what cluster does each data point belong to?  The cluster for each data point can be called ${Z}$.  We are also missing the parameters ${\mu_k}, {\Sigma_k}$.  In general, for a probabilistic model one can write the log likelihood as
+We then turned our attention to why the EM algorithm works.  
+
+EM is applicable when there is missing information.  For example, in clustering missing information is: what cluster does each data point belong to?  Call this missing information (cluster for each data point) $Z$, and call the data points themselves $X$.  If we are fitting Gaussian mixture models then we are also missing the parameters ${\mu_k}, {\Sigma_k}$.  The EM algorithm proceeds by guessing $Z$, finding $\mu_k, \Sigma_k$, updating $Z$, updating $\mu_k, \Sigma_k$, and repeating until convergence.
+
+In general, for a probabilistic model one can write the log likelihood as
 
 \begin{align*}
-\log p(X|\theta) &= \mathcal{L}(q,\theta) + KL(q||p)
+\log p(X|\theta) &= \mathcal{L}(q,\theta) + KL(q||p) \\
+                           &= E_{q(Z)}[\log p(X,Z|\theta)] + H(q) + KL(q||p)
 \end{align*}
 
 where
@@ -97,13 +100,11 @@ where
 KL(q||p) &= \sum_{z}{q(Z)\log(\frac{q(Z)}{p(Z|X,\theta)})}
 \end{align*}
 
-Since $ KL(q||p) \geq 0$, this means that we have a lower bound on the log-likelihood of
+But we can not maximize $p(X|\theta)$ directly because we do not know $\theta$.  Since $ KL(q||p) \geq 0$, this means that we have a lower bound on the log-likelihood of
 
 \begin{align*}
 \log p(X|\theta) &\geq \mathcal{L}(q,\theta) = E_{q}[\log p(X|\theta)] + H(q)
 \end{align*}
-
-In this sense, 
 
 In the E-step, maximize $\mathcal{L}(q,\theta)$ with respect to $q$.  Since $\log(p(X|\theta))$ does not depend on $q$ we can focus on minimizing the KL divergence $KL(q||p)$. If we use $q(Z) = p(Z|X,\theta)$ as our solution, we have $KL(q||p) = 0$ so for our current parameter estimate $\log p(X|\theta) = \mathcal{L}(q,\theta)$. In the M-step, we maximize $\mathcal{L}(q,\theta)$ with respect to $\theta$. This gives us a new estimated parameter $\theta^{new}$ where for our current $q$, $\mathcal{L}(q,\theta^{new}) \geq \mathcal{L}(q,\theta)$.  However, since the current q is not the optimal distribution for $\theta^{new}$, $KL(q||p) \geq 0$. This means that 
 
@@ -123,6 +124,14 @@ Over the past 10 years a very popular variant of the EM algorithm has been Varia
 
 In this process, $KL(q_{gamma}||p)$ does not become zero, but it does decrease.
 
+Auxillary Function Viewpoint of EM
+
+Here is another viewpoint on EM.  If we want to optimize an objective function $f$ or parameters of a model but we can not do gradient descent because of missing information, then we can use EM.  The EM algorithm constructs a simple 'surrogate' convex function $g$ that agrees with the objective function at some $\theta^{old}$ and is everywhere else less than the objective.  Then the value $\theta^{new}$ which maximizes the surrogate function is found.  We know $f(\theta^{new}) \ge f(\theta^{old}) \ge g(\theta^{old}) = f(\theta^{old})$ by construction.  Now we can construct a new convexfunction $h$ that agrees with $f$ at $\theta^{new}$ but is otherwise always less than or equal to $f$.
+
+A Final Point
+
+One last thing about learning mixture models.  Over the last 15 years there have been interesting developments in computer science for learning mixture models that do not use EM, which may get stuck in bad local minima.  These new methods give better guarantees and are theoretically elegant but are difficult to implement.
+
 \section{Spectral Clustering}
 Spectral clustering is a method of assigning data objects to different clusters or classes.  It differes from K-means clustering in that it does not necessarily rely on any Euclidean distance metric and does not make any implicit assumptions about the shape of the clusters within the overall dataset.
 
@@ -140,20 +149,20 @@ Here is the weight matrix corresponding to the example graph above (assuming for
 Then, the degree $d_i$ of each vertex is calculated.  For a given node, the degree of that node is a measure of its connectivity wth other nodes.  In a weighted graph, the degree is the sum of the weights between a node and all the other nodes it is connected to.  The degrees $d_i$ of all the vertices can be arranged in a diagonal matrix.
 
 
-(slide: graph cuts and spectral clustering)
-consider a data set like (***    ****) and another like a smiley face.  The second data set is not handled well by k-means because a certain geometric structure is assumed.
+%(slide: graph cuts and spectral clustering)
+Consider a data set like (***    ****) and another like (a smiley face).  The second data set is not handled well by k-means because a certain geometric structure is assumed.
 
-(slides: example data set slides)
+%(slides: example data set slides)
 
-(slide: similarity graphs)
-G=(V,E) a weighted, undirected graph; assume we have already constructed the graph
-each vertex is a data point; a data point need not be a real-valued vector ($x \in \mathbb{R}^d)$
-edge weight tells how similar are 2 data points
+%(slide: similarity graphs)
+G=(V,E) a weighted, undirected graph; assume we have already constructed the graph.
+Each vertex is a data point; a data point need not be a real-valued vector ($x \in \mathbb{R}^d)$.
+The edge weight tells how similar are 2 data points.
 
-(slide: graph notation)
-deg(i)=$\sum w_{ij}$
-'cut' $\bar{A}=V \ A$
+%(slide: graph notation)
 \begin{align*}
+\text{deg}(i) &=\sum w_{ij} \\
+\text{'cut'} \bar{A} &=V \ A \\
 \mathbbold{1}_A &= \begin{bmatrix}
  1 \\
  1 \\
@@ -162,22 +171,22 @@ deg(i)=$\sum w_{ij}$
 \end{bmatrix}
 \end{align*}
 
-(slide: unnormalized graph Laplacian)
-this is the 'first' kind of graph Laplacian
+%(slide: unnormalized graph Laplacian)
+The unnormalized graph Laplacian is the 'first' kind of graph Laplacian:
 \begin{align}
 L_U = D - W
 \end{align}
-where D is a diagonal matrix of vertex degrees and W is the weight matrix (adjacency matrix).  Note diagonal of W is zero since no self-connections.  Also note the sum of each row of $L_u$ is zero.
+where D is a diagonal matrix of vertex degrees and W is the weight matrix (adjacency matrix).  Note diagonal of W is zero since no self-connections.  Also note the sum of each row of $L_U$ is zero.
 
-What's special about $L_u$?
+What's special about $L_U$?
 For any $f \in \mathbb{R}^n$, 
 
 \begin{align}
-f^TL_uf=\sum_{i,j}w_{ij}(f_i-f_j)^2
+f^TL_Uf=\sum_{i,j}w_{ij}(f_i-f_j)^2
 \end{align}
-is convex if $L_u$ is positive semidefinite.  In fact, $L_u$ is always symmetric and positive semidefinite.  What does the RHS tell us?  (figure *v*---*x*) To minimize $f^TL_uf$ we need $f_i=f_j$ for edges with large weight.  Edges with low weight can have different $f_i,f_j$.  This is at the crux of what spectral clustering algorithms try to do.  The smallest eigenvalue of $L_u$ is 0, this is the 'trivial solution' for clustering.  The corresponding eigenvector is $\mathbbold{1}$.  Since $L_u\mathbbold{1}=0$ since $L_u\mathbbold{1}$ is a column of row sums.  This may not be so exciting.  Here's the exciting part:
+is convex if $L_U$ is positive semidefinite.  In fact, $L_U$ is always symmetric and positive semidefinite.  What does the RHS tell us?  (figure *v*---*x*) To minimize $f^TL_Uf$ we need $f_i=f_j$ for edges with large weight.  Edges with low weight can have different $f_i,f_j$.  This is at the crux of what spectral clustering algorithms try to do.  The smallest eigenvalue of $L_U$ is 0, this is the 'trivial solution' for clustering.  The corresponding eigenvector is $\mathbbold{1}$.  Since $L_U\mathbbold{1}=0$ since $L_U\mathbbold{1}$ is a column of row sums.  This may not be so exciting.  Here's the exciting part:
 
-(slide: A Key Property)
+%(slide: A Key Property)
 Number of 0 eigenvalues is number of connected components.  (figure: smiley face)
 %% Add your references to myrefs.bib and uncomment the following 2 lines
 %\bibliography{myrefs}
