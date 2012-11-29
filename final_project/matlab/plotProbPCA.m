@@ -1,3 +1,4 @@
+%
 function plotProbPCA(data, component_count, flat)
 [obs_count channel_count] = size(data);
 %{
