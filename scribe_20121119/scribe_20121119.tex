@@ -72,15 +72,15 @@ Michael Powell
 
 %review: Gaussian Mixtures Revisited
 We began by recalling that for Gaussian mixtures, the EM algorithm involves an E-step of evaluating the probabilities 
-\begin{align*}
+\begin{align}
 p(z_{k}|x_{n}) = \frac{\pi_{k}\mathcal{N}(x|\mu_{k},\Sigma_{k})}{\sum_{j=1}^{K}\pi_{j}\mathcal{N}(x|\mu_{j},\Sigma_j)}
-\end{align*}
+\end{align}
 and the M-step computes the new parameters 
-\begin{align*}
+\begin{align}
 \mu_k &= \frac{1}{N_{k}}\sum_{n=1}^{N}{p(z_{k}|x_{n})x_{n}} \\
 \Sigma_{k} &= \frac{1}{N_{k}}\sum_{n=1}^{N}{p(z_{k}|x_{n})(x_{n}-\mu_{k})(x_{n}-\mu_{k})^{T}} \\
 \pi_{k} &= \frac{N_{k}}{N}
-\end{align*}
+\end{align}
 
 We then turned our attention to why the EM algorithm works.  
 
@@ -88,47 +88,47 @@ EM is applicable when there is missing information.  For example, in clustering 
 
 In general, for a probabilistic model one can write the log likelihood as
 
-\begin{align*}
+\begin{align}
 \log p(X|\theta) &= \mathcal{L}(q,\theta) + KL(q||p) \\
                            &= E_{q(Z)}[\log p(X,Z|\theta)] + H(q) + KL(q||p)
-\end{align*}
+\end{align}
 
 where
 
-\begin{align*}
+\begin{align}
 \mathcal{L}(q,\theta) &= \sum_{z}{q(Z)\log(\frac{p(X,Z|\theta)}{q(Z)})} \\
 KL(q||p) &= \sum_{z}{q(Z)\log(\frac{q(Z)}{p(Z|X,\theta)})}
-\end{align*}
+\end{align}
 
 But we can not maximize $p(X|\theta)$ directly because we do not know $\theta$.  Since $ KL(q||p) \geq 0$, this means that we have a lower bound on the log-likelihood of
 
-\begin{align*}
+\begin{align}
 \log p(X|\theta) &\geq \mathcal{L}(q,\theta) = E_{q}[\log p(X|\theta)] + H(q)
-\end{align*}
+\end{align}
 
 In the E-step, maximize $\mathcal{L}(q,\theta)$ with respect to $q$.  Since $\log(p(X|\theta))$ does not depend on $q$ we can focus on minimizing the KL divergence $KL(q||p)$. If we use $q(Z) = p(Z|X,\theta)$ as our solution, we have $KL(q||p) = 0$ so for our current parameter estimate $\log p(X|\theta) = \mathcal{L}(q,\theta)$. In the M-step, we maximize $\mathcal{L}(q,\theta)$ with respect to $\theta$. This gives us a new estimated parameter $\theta^{new}$ where for our current $q$, $\mathcal{L}(q,\theta^{new}) \geq \mathcal{L}(q,\theta)$.  However, since the current q is not the optimal distribution for $\theta^{new}$, $KL(q||p) \geq 0$. This means that 
 
-\begin{align*}
+\begin{align}
 \log p(X|\theta^{new}) &\geq \mathcal{L}(q,\theta^{new}) \geq \mathcal{L}(q,\theta) = \log p(X|\theta)
-\end{align*}
+\end{align}
 
 So the log-likelihood will either increase or stay the same after each combination of E-step and M-step.
 
-Variational EM
+\subsection{Variational EM}
 
 Over the past 10 years a very popular variant of the EM algorithm has been Variational EM, especially for statistical models.  For some models $p(Z|X,\theta)$ cannot be obtained in closed form.  In this case pick a parameterized family $q_{\gamma}=q(Z|\gamma)$ and minimize with respect to $\gamma$ to minimize $KL(q_{\gamma}||p)$.  This is the same as maximizing a lower bound to the true likelihood
 
-\begin{align*}
+\begin{align}
 \log p(X|\theta) \geq E_{q_{\gamma}}[\log p(X,Z|\theta)] + H(q_{\gamma})
-\end{align*}
+\end{align}
 
 In this process, $KL(q_{gamma}||p)$ does not become zero, but it does decrease.
 
-Auxillary Function Viewpoint of EM
+\subsection{Auxillary Function Viewpoint of EM}
 
 Here is another viewpoint on EM.  If we want to optimize an objective function $f$ or parameters of a model but we can not do gradient descent because of missing information, then we can use EM.  The EM algorithm constructs a simple 'surrogate' convex function $g$ that agrees with the objective function at some $\theta^{old}$ and is everywhere else less than the objective.  Then the value $\theta^{new}$ which maximizes the surrogate function is found.  We know $f(\theta^{new}) \ge f(\theta^{old}) \ge g(\theta^{old}) = f(\theta^{old})$ by construction.  Now we can construct a new convexfunction $h$ that agrees with $f$ at $\theta^{new}$ but is otherwise always less than or equal to $f$.
 
-A Final Point
+\subsection{A Final Point}
 
 One last thing about learning mixture models.  Over the last 15 years there have been interesting developments in computer science for learning mixture models that do not use EM, which may get stuck in bad local minima.  These new methods give better guarantees and are theoretically elegant but are difficult to implement.
 
@@ -139,6 +139,21 @@ The first step in spectral clustering is to create an undirected, weighted graph
 
 \begin{figure}
 \includegraphics{graph_0}
+\caption{}
+\end{figure}
+
+\begin{figure}
+\includegraphics{smiley_face_graph}
+\caption{k-means hates smiley faces}
+\end{figure}
+
+\begin{figure}
+\includegraphics{graph_1}
+\caption{}
+\end{figure}
+
+\begin{figure}
+\includegraphics{graph_cut}
 \caption{}
 \end{figure}
 
@@ -160,16 +175,16 @@ Each vertex is a data point; a data point need not be a real-valued vector ($x \
 The edge weight tells how similar are 2 data points.
 
 %(slide: graph notation)
-\begin{align*}
+\begin{align}
 \text{deg}(i) &=\sum w_{ij} \\
-\text{'cut'} \bar{A} &=V \ A \\
+\text{'cut'} \bar{A} &=V \backslash A \\
 \mathbbold{1}_A &= \begin{bmatrix}
  1 \\
  1 \\
  0 \\
  0
 \end{bmatrix}
-\end{align*}
+\end{align}
 
 %(slide: unnormalized graph Laplacian)
 The unnormalized graph Laplacian is the 'first' kind of graph Laplacian:
